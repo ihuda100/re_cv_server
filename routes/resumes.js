@@ -1,6 +1,7 @@
 var express = require("express");
 const { ResumeModel, validResume } = require("../models/resumeModel");
 const { auth } = require("../middlewares/auth");
+const { convertPDFToJson } = require("../middlewares/gpt");
 var router = express.Router();
 
 /* GET home page. */
@@ -39,7 +40,6 @@ router.post("/upgrade", auth, async (req, res, next) => {
   }
 });
 
-
 // Updates the resume after change and approval
 router.post("/update", async (req, res, next) => {
   let validBody = validResume(req.body);
@@ -57,6 +57,10 @@ router.post("/update", async (req, res, next) => {
     console.log(err);
   }
 });
+
+// router.post("/template", async(req,res,next) => {
+
+// });
 
 
 

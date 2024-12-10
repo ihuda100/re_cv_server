@@ -11,8 +11,8 @@ module.exports = async (email, subject, text) => {
     auth: {
       // user: process.env.USER, 
       user: "ihuda100@gmail.com", 
+      // pass: process.env.PASS,
       pass: "ahgs qeeo nsch tgfy", 
-      // pass: process.env.PASS, 
     },
   });
 
