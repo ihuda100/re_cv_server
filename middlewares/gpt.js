@@ -1,16 +1,16 @@
-// 
+//
 
-require('dotenv').config(); // Load environment variables from .env
+require("dotenv").config(); // Load environment variables from .env
 
-const fs = require('fs');
-const pdfParse = require('pdf-parse');
-const { OpenAI } = require('openai');
+const fs = require("fs");
+// const path = require('path');
+const pdfParse = require("pdf-parse");
+const { OpenAI } = require("openai");
 
-
-
+let pdfFile;
 
 // Validate required environment variables
-const requiredEnvVars = ['OPENAI_API_KEY'];
+const requiredEnvVars = ["OPENAI_API_KEY"];
 requiredEnvVars.forEach((envVar) => {
   if (!process.env[envVar]) {
     console.error(`Error: Missing required environment variable: ${envVar}`);
@@ -21,19 +21,16 @@ requiredEnvVars.forEach((envVar) => {
 // Set up OpenAI API client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-  
 });
 
 // Read and extract text from the uploaded PDF
-async function extractTextFromPDF(pdfFilePath) {
+async function extractTextFromPDF(pdfFile) {
   try {
-    const dataBuffer = fs.readFileSync(pdfFilePath);
+    const dataBuffer = fs.readFileSync(pdfFile);
     const data = await pdfParse(dataBuffer);
-
-    console.log(`Extracting`, data);
     return data.text;
   } catch (error) {
-    console.error('Error extracting text from PDF:', error.message);
+    console.error("Error extracting text from PDF:", error.message);
     throw error;
   }
 }
@@ -42,15 +39,15 @@ async function extractTextFromPDF(pdfFilePath) {
 async function organizeResumeData(textContent) {
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: "gpt-4",
       messages: [
         {
-          role: 'system',
+          role: "system",
           content: `You are a resume parser. Your task is to extract and organize the resume data into a standardized JSON format with the following categories: 
           "personal_information", "objective", "education", "work_experience", "skills", "languages", and "projects". 
           Return only the clean JSON without any additional text. Ensure that the JSON is well-structured and contains no unnecessary information.`,
         },
-        { role: 'user', content: textContent },
+        { role: "user", content: textContent },
       ],
     });
 
@@ -59,15 +56,17 @@ async function organizeResumeData(textContent) {
 
     try {
       organizedData = JSON.parse(rawResponse);
-      console.log('Organized resume data:', organizedData);
+      console.log("Organized resume data:", organizedData);
     } catch (parseError) {
-      console.error('Error parsing OpenAI response. Returning raw response for manual review.');
+      console.error(
+        "Error parsing OpenAI response. Returning raw response for manual review."
+      );
       organizedData = { raw_response: rawResponse };
     }
 
     return organizedData;
   } catch (error) {
-    console.error('Error organizing resume data:', error.message);
+    console.error("Error organizing resume data:", error.message);
     throw error;
   }
 }
@@ -76,14 +75,14 @@ async function organizeResumeData(textContent) {
 async function upgradeResumeJson(resumeJson, profession) {
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: "gpt-4",
       messages: [
         {
-          role: 'system',
+          role: "system",
           content: `You are a resume enhancer. Your task is to improve the resume JSON provided by adding missing details, enhancing descriptions, and making it more professional and appealing for job applications. 
-          Ensure the JSON format remains standardized with categories such as "personal_information", "objective", "education", "work_experience", "skills", "languages", and "projects". Also, tailor the resume for the profession: ${profession}.`
+          Ensure the JSON format remains standardized with categories such as "personal_information", "objective", "education", "work_experience", "skills", "languages", and "projects". Also, tailor the resume for the profession: ${profession}.`,
         },
-        { role: 'user', content: JSON.stringify(resumeJson) },
+        { role: "user", content: JSON.stringify(resumeJson) },
       ],
     });
 
@@ -93,28 +92,39 @@ async function upgradeResumeJson(resumeJson, profession) {
     try {
       upgradedData = JSON.parse(rawResponse);
     } catch (parseError) {
-      console.error('Error parsing OpenAI response. Returning raw response for manual review.');
+      console.error(
+        "Error parsing OpenAI response. Returning raw response for manual review."
+      );
       upgradedData = { raw_response: rawResponse };
     }
-
+    console.log(upgradedData);
     return upgradedData;
   } catch (error) {
-    console.error('Error upgrading resume JSON:', error.message);
+    console.error("Error upgrading resume JSON:", error.message);
     throw error;
   }
 }
 
 // Middleware function to convert PDF to JSON
-async function convertPDFToJson(pdfFilePath) {
+async function processResume() {
   try {
-
-    const extractedText = await extractTextFromPDF(pdfFilePath);
+    const extractedText = await extractTextFromPDF(pdfFile);
     const organizedJson = await organizeResumeData(extractedText);
     return organizedJson;
   } catch (error) {
-    console.error('Error converting PDF to JSON:', error.message);
+    console.error("Error converting PDF to JSON:", error.message);
     throw error;
   }
 }
 
-module.exports = { convertPDFToJson, upgradeResumeJson };
+const convertPDFToJson = (data) => {
+  pdfFile = data;
+  return processResume();
+  // upgradeResumeJson(processResume(),"Hitech");
+};
+
+const cvUpgrade = (data) => {
+  upgradeResumeJson(data,"Hitech");
+}
+
+module.exports = { convertPDFToJson, cvUpgrade };
