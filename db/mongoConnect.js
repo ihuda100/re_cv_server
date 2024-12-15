@@ -7,8 +7,6 @@ async function main() {
   await mongoose.connect(
     // `mongodb+srv://re_cv_server:1234@cluster0.vruq0.mongodb.net/re_cv`
     `mongodb+srv://${process.env.USER_DB}:${process.env.PASS_DB}@cluster0.vruq0.mongodb.net/re_cv`
-
-
   );
   console.log("mongo connect");
 }
