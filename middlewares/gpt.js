@@ -56,7 +56,6 @@ async function organizeResumeData(textContent) {
 
     try {
       organizedData = JSON.parse(rawResponse);
-      console.log("Organized resume data:", organizedData);
     } catch (parseError) {
       console.error(
         "Error parsing OpenAI response. Returning raw response for manual review."
@@ -124,7 +123,7 @@ const convertPDFToJson = (data) => {
 };
 
 const cvUpgrade = (data) => {
-  upgradeResumeJson(data,"Hitech");
+  return upgradeResumeJson(data,"Hitech");
 }
 
 module.exports = { convertPDFToJson, cvUpgrade };

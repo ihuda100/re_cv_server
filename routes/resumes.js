@@ -30,10 +30,12 @@ router.post("/upgrade", auth, async (req, res, next) => {
     return res.status(400).json(validBody.error.details);
   }
   try {
-    let _idUser = req.userToken.id;
+   
+    let _idUser = req.tokenData._id;
     let data = req.body;
     let upgrateData = await cvUpgrade(data);
-    let resume = new ResumeModel(upgrateData);
+    console.log(upgrateData.personal_information);
+    let resume = new ResumeModel(upgrateData.personal_information);
     resume._idUser = _idUser
     await resume.save();
     res.status(201).json(resume);
@@ -48,7 +50,6 @@ router.post("/update", async (req, res, next) => {
   if (validBody.error) {
     return res.status(400).json(validBody.error.details);
   }
-  
   try {
     let data = req.body;
     let resume = await ResumeModel.findOne({ id: data._id });
