@@ -3,6 +3,7 @@ const { ResumeModel, validResume } = require("../models/resumeModel");
 const { auth } = require("../middlewares/auth");
 const { convertPDFToJson, cvUpgrade } = require("../middlewares/gpt");
 var router = express.Router();
+const fs = require("fs");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 
@@ -14,8 +15,9 @@ router.get("/", (req, res, next) => {
 
 // Convert from PDF to json
 router.post("/convert", upload.single('file'), async (req, res, next) => {
-  try {
+  try {    
     let data = await convertPDFToJson(req.file.path);
+    fs.unlinkSync(req.file.path); // Delete file from upload after read  
     res.status(200).json(data);
   } catch (err) {
     console.log(err);
