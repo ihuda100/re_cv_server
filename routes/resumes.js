@@ -48,6 +48,7 @@ router.post("/update", async (req, res, next) => {
   if (validBody.error) {
     return res.status(400).json(validBody.error.details);
   }
+  
   try {
     let data = req.body;
     let resume = await ResumeModel.findOne({ id: data._id });
