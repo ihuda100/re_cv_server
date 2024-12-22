@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
 
-(async () => {
+exports.pdfGeneret = () =>{ (async () => {
   // Launch a headless browser
   const browser = await puppeteer.launch();
 
@@ -65,3 +65,5 @@ const path = require("path");
   // Close the browser
   await browser.close();
 })();
+}
+

@@ -2,6 +2,7 @@ var express = require("express");
 const { ResumeModel, validResume } = require("../models/resumeModel");
 const { auth } = require("../middlewares/auth");
 const { convertPDFToJson, cvUpgrade } = require("../middlewares/gpt");
+const { pdfGeneret } = require("../middlewares/pdfStyle");
 var router = express.Router();
 const fs = require("fs");
 const multer = require("multer");
@@ -64,9 +65,10 @@ router.post("/update", async (req, res, next) => {
   }
 });
 
-// router.post("/template", async(req,res,next) => {
+router.post("/template", async(req,res,next) => {
 
-// });
+  pdfGeneret();
+});
 
 
 
