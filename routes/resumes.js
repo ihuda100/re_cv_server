@@ -66,8 +66,8 @@ router.post("/update", async (req, res, next) => {
 });
 
 router.post("/template", async(req,res,next) => {
-
   pdfGeneret();
+  res.end();
 });
 
 

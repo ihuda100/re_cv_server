@@ -47,7 +47,7 @@ exports.pdfGeneret = () =>{ (async () => {
         <p>${data.lastName}</p>
         <p>${data.occupation}</p>
 
-        <img src="https://example.com/example.jpg" alt="Example Image" />
+        <img src="https://ae01.alicdn.com/kf/S4eb98cd63b3c47ceb854d776d82605c6B.jpg?width=800&height=800&hash=1600" alt="Example Image" />
       </body>
     </html>
   `);
