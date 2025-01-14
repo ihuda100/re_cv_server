@@ -13,18 +13,27 @@ router.get("/", (req, res, next) => {
   res.json({ msg: "Work from resumes.js" });
 });
 
-
 // Convert from PDF to json
-router.post("/convert", upload.single('file'), async (req, res, next) => {
-  try {    
-    let data = await convertPDFToJson(req.file.path);
-    fs.unlinkSync(req.file.path); // Delete file from upload after read  
-    res.status(200).json(data);
+router.post("/convert", upload.single("file"), async (req, res, next) => {
+  try {
+    let json = await convertPDFToJson(req.file.path);
+    let validBody = validResume(json);
+    if (validBody.error) {
+      return res.status(400).json(validBody.error.details);
+    }
+    // console.log(req.tokenData)
+    // let _idUser = req.tokenData._id;
+    let upgrateData = await cvUpgrade(json);
+    let resume = new ResumeModel(upgrateData);
+    resume._idUser = '1234';
+    const data = await resume.save();
+    console.log(data)
+    fs.unlinkSync(req.file.path); // Delete file from upload after read
+    res.status(201).json(data);
   } catch (err) {
     console.log(err);
   }
 });
-
 
 // Upgrades the resume
 router.post("/upgrade", auth, async (req, res, next) => {
@@ -33,13 +42,12 @@ router.post("/upgrade", auth, async (req, res, next) => {
     return res.status(400).json(validBody.error.details);
   }
   try {
-   
     let _idUser = req.tokenData._id;
     let data = req.body;
     let upgrateData = await cvUpgrade(data);
-    console.log(upgrateData.personal_information);
-    let resume = new ResumeModel(upgrateData.personal_information);
-    resume._idUser = _idUser
+    console.log(upgrateData);
+    let resume = new ResumeModel(upgrateData);
+    resume._idUser = _idUser;
     await resume.save();
     res.status(201).json(resume);
   } catch (err) {
@@ -55,7 +63,7 @@ router.post("/update", async (req, res, next) => {
   }
   try {
     let data = req.body;
-    let resume = await ResumeModel.findOne({ id: data._id });
+    let resume = await ResumeModel.findOne({ _id: data._id });
     resume = data;
     resume.ifUpdate = true;
     let updateData = await ResumeModel.updateOne({ _id: resume._id }, resume);
@@ -65,11 +73,9 @@ router.post("/update", async (req, res, next) => {
   }
 });
 
-router.post("/template", async(req,res,next) => {
+router.post("/template", async (req, res, next) => {
   pdfGeneret();
   res.end();
 });
-
-
 
 module.exports = router;
