@@ -6,6 +6,7 @@ const { pdfGeneret } = require("../middlewares/pdfStyle");
 var router = express.Router();
 const fs = require("fs");
 const multer = require("multer");
+const { log } = require("util");
 const upload = multer({ dest: "uploads/" });
 
 /* GET home page. */
@@ -14,20 +15,27 @@ router.get("/", (req, res, next) => {
 });
 
 // Convert from PDF to json
-router.post("/convert", upload.single("file"), async (req, res, next) => {
+router.post("/convert", auth, upload.single("file"), async (req, res, next) => {
   try {
     let json = await convertPDFToJson(req.file.path);
     let validBody = validResume(json);
     if (validBody.error) {
       return res.status(400).json(validBody.error.details);
     }
-    // console.log(req.tokenData)
-    // let _idUser = req.tokenData._id;
+    let _idUser = req.tokenData._id;
     let upgrateData = await cvUpgrade(json);
+    console.log(upgrateData);
+    if (upgrateData.syntaxError) {
+      console.log("22222222222222");
+      upgrateData = await cvUpgrade(json);
+      if (upgrateData.syntaxError) {
+        return res.status(400).json(upgrateData.SyntaxError);
+      }
+    }
     let resume = new ResumeModel(upgrateData);
-    resume._idUser = '1234';
+    resume._idUser = _idUser;
     const data = await resume.save();
-    console.log(data)
+    console.log(data);
     fs.unlinkSync(req.file.path); // Delete file from upload after read
     res.status(201).json(data);
   } catch (err) {
@@ -46,6 +54,13 @@ router.post("/upgrade", auth, async (req, res, next) => {
     let data = req.body;
     let upgrateData = await cvUpgrade(data);
     console.log(upgrateData);
+    if (upgrateData.SyntaxError) {
+      console.log("22222222222222");
+      upgrateData = await cvUpgrade(json);
+      if (upgrateData.SyntaxError) {
+        return res.status(400).json(upgrateData.SyntaxError);
+      }
+    }
     let resume = new ResumeModel(upgrateData);
     resume._idUser = _idUser;
     await resume.save();

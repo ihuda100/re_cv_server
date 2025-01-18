@@ -108,18 +108,18 @@ async function upgradeResumeJson(resumeJson, profession) {
     });
 
     const rawResponse = response.choices[0].message.content.trim();
-    //  upgradedData;
+    let upgradedData;
 
     try {
-      let upgradedData = JSON.parse(rawResponse);
-      console.log(upgradedData);
-      return upgradedData;
+      upgradedData = JSON.parse(rawResponse);
     } catch (parseError) {
       console.error(
         "Error parsing OpenAI response. Returning raw response for manual review."
       );
-      // upgradedData = { raw_response: rawResponse };
+      upgradedData = { raw_response: rawResponse };
     }
+    console.log(upgradedData);
+    return upgradedData;
   } catch (error) {
     console.error("Error upgrading resume JSON:", error.message);
     throw error;
@@ -144,6 +144,7 @@ const convertPDFToJson = (data) => {
   } catch (err) {
     console.error(err);
   }
+  
   // upgradeResumeJson(processResume(),"Hitech");
 };
 
