@@ -7,6 +7,7 @@ var router = express.Router();
 const fs = require("fs");
 const multer = require("multer");
 const { log } = require("util");
+const { error } = require("console");
 const upload = multer({ dest: "uploads/" });
 
 /* GET home page. */
@@ -88,9 +89,18 @@ router.post("/update", async (req, res, next) => {
   }
 });
 
-router.post("/template", async (req, res, next) => {
-  pdfGeneret();
-  res.end();
+router.post("/getinfo", async (req, res, next) => {
+  try {
+    let _id = req.body.id;
+    console.log(_id)
+    const resume = await ResumeModel.findOne({ _id });
+    if(!resume.ifUpdate){
+      return res.status(400).json({message: 'Please verify you resumes'});
+    }
+    res.status(200).json(resume);
+  } catch (err) {
+    res.status(404).json({err, message: 'the _id is not found'})
+  }
 });
 
 module.exports = router;
