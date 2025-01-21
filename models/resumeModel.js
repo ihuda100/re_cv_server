@@ -24,8 +24,8 @@ exports.validResume = (_bodyData) => {
     fullName: Joi.string().min(5).max(30).required(),
     email: Joi.string().min(5).max(30).email().required(),
     phone: Joi.string().min(10).max(15).required(),
-    linkdin: Joi.string().max(100).allow(""),
-    gitHub: Joi.string().max(100).allow(""),
+    linkdin: Joi.string().max(100).allow("").optional(),
+    gitHub: Joi.string().max(100).allow("").optional(),
     ifUpdate: Joi.boolean().allow(""),
     body: Joi.alternatives()
       .try(Joi.object().min(1).max(50), Joi.string().min(5).max(10000))

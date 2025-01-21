@@ -8,6 +8,7 @@ const fs = require("fs");
 const multer = require("multer");
 const { log } = require("util");
 const { error } = require("console");
+const { resourceLimits } = require("worker_threads");
 const upload = multer({ dest: "uploads/" });
 
 /* GET home page. */
@@ -34,6 +35,8 @@ router.post("/convert", auth, upload.single("file"), async (req, res, next) => {
       }
     }
     let resume = new ResumeModel(upgrateData);
+    console.log(resume);
+    
     resume._idUser = _idUser;
     const data = await resume.save();
     console.log(data);
@@ -92,9 +95,8 @@ router.post("/update", async (req, res, next) => {
 router.post("/getinfo", async (req, res, next) => {
   try {
     let _id = req.body.id;
-    console.log(_id)
     const resume = await ResumeModel.findOne({ _id });
-    if(!resume.ifUpdate){
+    if(resume.ifUpdate == false){
       return res.status(400).json({message: 'Please verify you resumes'});
     }
     res.status(200).json(resume);
