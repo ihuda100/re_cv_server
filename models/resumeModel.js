@@ -13,6 +13,7 @@ const resumeSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  dateCreated: { type: Date, default: Date.now },
 });
 exports.ResumeModel = mongoose.model("resumes", resumeSchema);
 

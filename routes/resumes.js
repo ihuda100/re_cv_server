@@ -16,32 +16,50 @@ router.get("/", (req, res, next) => {
   res.json({ msg: "Work from resumes.js" });
 });
 
+//GET information on client by ID
+router.get("/:id", async (req, res, next) => {
+  let id = req.params.id;
+  console.log(id);
+  try {
+    const uesrList = await ResumeModel.find({ _idUser: id });
+    if (!userList) {
+      return res.status(404).json({ error: "No resumes found for this ID" });
+    }
+    res.status(200).json(uesrList);
+  } catch (err) {
+    res.status(404).json({ error: "dont have resumes in this id" });
+  }
+});
 // Convert from PDF to json
 router.post("/convert", auth, upload.single("file"), async (req, res, next) => {
   try {
     let json = await convertPDFToJson(req.file.path);
+    fs.unlinkSync(req.file.path); // Delete file from upload after read
     let validBody = validResume(json);
     if (validBody.error) {
       return res.status(400).json(validBody.error.details);
     }
     let _idUser = req.tokenData._id;
-    let upgrateData = await cvUpgrade(json);
-    console.log(upgrateData);
-    if (upgrateData.syntaxError) {
-      console.log("22222222222222");
-      upgrateData = await cvUpgrade(json);
-      if (upgrateData.syntaxError) {
-        return res.status(400).json(upgrateData.SyntaxError);
-      }
+    try {
+      let upgrateData = await cvUpgrade(json);
+      console.log(upgrateData);
+      // if (upgrateData.syntaxError) {
+      //   console.log("22222222222222");
+      //   upgrateData = await cvUpgrade(json);
+      //   if (upgrateData.syntaxError) {
+      //     return res.status(400).json(upgrateData.SyntaxError);
+      //   }
+      // }
+      let resume = new ResumeModel(upgrateData);
+      console.log(resume);
+
+      resume._idUser = _idUser;
+      const data = await resume.save();
+      console.log(data);
+      res.status(201).json(data);
+    } catch (err) {
+      console.log(err);
     }
-    let resume = new ResumeModel(upgrateData);
-    console.log(resume);
-    
-    resume._idUser = _idUser;
-    const data = await resume.save();
-    console.log(data);
-    fs.unlinkSync(req.file.path); // Delete file from upload after read
-    res.status(201).json(data);
   } catch (err) {
     console.log(err);
   }
@@ -96,12 +114,12 @@ router.post("/getinfo", async (req, res, next) => {
   try {
     let _id = req.body.id;
     const resume = await ResumeModel.findOne({ _id });
-    if(resume.ifUpdate == false){
-      return res.status(400).json({message: 'Please verify you resumes'});
+    if (resume.ifUpdate == false) {
+      return res.status(400).json({ message: "Please verify you resumes" });
     }
     res.status(200).json(resume);
   } catch (err) {
-    res.status(404).json({err, message: 'the _id is not found'})
+    res.status(404).json({ err, message: "the _id is not found" });
   }
 });
 
