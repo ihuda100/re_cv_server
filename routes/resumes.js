@@ -22,7 +22,7 @@ router.get("/:id", async (req, res, next) => {
   console.log(id);
   try {
     const uesrList = await ResumeModel.find({ _idUser: id });
-    if (!userList) {
+    if (uesrList.length == 0) {
       return res.status(404).json({ error: "No resumes found for this ID" });
     }
     res.status(200).json(uesrList);
