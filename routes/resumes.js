@@ -114,9 +114,9 @@ router.post("/getinfo", async (req, res, next) => {
   try {
     let _id = req.body.id;
     const resume = await ResumeModel.findOne({ _id });
-    // if (resume.ifUpdate == false) {
-    //   return res.status(400).json({ message: "Please verify you resumes" });
-    // }
+    if (resume.ifUpdate == false) {
+      return res.status(400).json({ message: "Please verify you resumes" });
+    }
     res.status(200).json(resume);
   } catch (err) {
     res.status(404).json({ err, message: "the _id is not found" });
