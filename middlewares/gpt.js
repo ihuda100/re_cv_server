@@ -81,75 +81,6 @@ async function organizeResumeData(textContent) {
   }
 }
 
-// const sanitizeResponse = (response) => {
-//   return response
-//     .replace(/\\n/g, "\n") // החלפת תווי שורה
-//     .replace(/\\'/g, "'") // החלפת גרש בודד
-//     .replace(/\\"/g, '"') // החלפת גרש כפול
-//     .trim(); // הסרת רווחים מיותרים
-// };
-
-// Function to upgrade a JSON resume using OpenAI and add requested profession
-// async function upgradeResumeJson(resumeJson, profession) {
-//   try {
-//     const response = await openai.chat.completions.create({
-//       model: "gpt-4",
-//       messages: [
-//         {
-//           role: "system",
-//           content: `
-//           You are a resume enhancer. Your task is to improve the resume JSON provided by adding missing details, enhancing descriptions, and making it more professional and appealing for job applications.
-//           Ensure the response is strictly in the following JSON format:
-//           {
-//             "fullName": "not change",
-//             "phone": "not change",
-//             "email": "not change",
-//             "linkdin": "not change value",
-//             "gitHub": "not edit this value",
-//             "body": "in string with titles and body separated by newlines, formatted like:
-//               Title: \\n
-//               Body: \\n
-//               Work Experience work history separated by newlines
-//               ..."
-//           }
-//           DO NOT include any additional explanations, headers, or text outside the JSON structure. Respond STRICTLY with the JSON in the format provided above. Return ONLY the JSON.
-//           Tailor the resume for the profession: ${profession}.
-//           `,
-//           //  remains standardized with categories such as "personal_information", "objective", "education", "work_experience", "skills", "languages", and "projects". Also,
-
-//         },
-//         { role: "user", content: JSON.stringify(resumeJson) },
-//       ],
-//     });
-
-//     const rawResponse = response.choices[0].message.content.trim();
-//     let upgradedData;
-
-//     try {
-//       upgradedData = JSON.parse(rawResponse);
-//       console.log(upgradedData)
-//       if (
-//         !upgradedData.fullName ||
-//         !upgradedData.phone ||
-//         !upgradedData.email ||
-//         !upgradedData.body
-//       ) {
-//         throw new Error("Missing required fields in the JSON response.");
-//       }
-//     } catch (parseError) {
-//       console.error(
-//         "Error parsing OpenAI response. Returning raw response for manual review."
-//       );
-//       // upgradedData = {rawResponse};
-//     }
-//     // console.log(upgradedData);
-//     return upgradedData;
-//   } catch (error) {
-//     console.error("Error upgrading resume JSON:", error.message);
-//     throw error;
-//   }
-// }
-
 async function upgradeResumeJson(resumeJson, profession) {
   try {
     const response = await openai.chat.completions.create({
@@ -213,9 +144,6 @@ async function upgradeResumeJson(resumeJson, profession) {
   }
 }
 
-
-
-
 // Middleware function to convert PDF to JSON
 async function processResume(data) {
   try {
@@ -234,7 +162,6 @@ const convertPDFToJson = (data) => {
   } catch (err) {
     console.error(err);
   }
-
   // upgradeResumeJson(processResume(),"Hitech");
 };
 
