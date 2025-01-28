@@ -97,14 +97,20 @@ async function upgradeResumeJson(resumeJson, profession) {
             "email": "not change",   
             "linkdin": "DONT change/create", 
             "gitHub": "DONT change/create",  
-            "body": "in string with titles and body separated by newlines, formatted like:
-              Title: \\n
-              Body: \\n
-              ..."
+            "body": [{
+              "key": "titel",
+              "value": "body in String"
+              ONLY in freeWords "key": "", "value": "General strengths extracted or improved from freeWords, in string format"
+              ALSO word experience with \\n between difference works
+            }]
           } 
           Respond ONLY with JSON in the specified format. Do not include any additional text or special characters outside the JSON structure.
           Tailor the resume for the profession: ${profession}.
           `,
+          // "in string with titles and body separated by newlines, formatted like:
+          //     Title: \\n
+          //     Body: \\n
+          //     ..."
         },
         { role: "user", content: JSON.stringify(resumeJson) },
       ],

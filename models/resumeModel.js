@@ -8,7 +8,7 @@ const resumeSchema = new mongoose.Schema({
   phone: String,
   linkdin: String,
   gitHub: String,
-  body: String,
+  body: Object,
   ifUpdate: {
     type: Boolean,
     default: false,
@@ -29,8 +29,10 @@ exports.validResume = (_bodyData) => {
     linkdin: Joi.string().max(100).allow("").optional(),
     gitHub: Joi.string().max(100).allow("").optional(),
     ifUpdate: Joi.boolean().allow(""),
-    body: Joi.alternatives()
-      .try(Joi.object().min(1).max(50), Joi.string().min(5).max(10000))
+    body: // Joi.alternatives()
+      // .try(
+        Joi.object().min(0).max(50)
+        //  Joi.string().min(5).max(10000))
       .required(),
   });
   return joiSchema.validate(_bodyData);

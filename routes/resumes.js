@@ -42,7 +42,7 @@ router.post("/convert", auth, upload.single("file"), async (req, res, next) => {
     let _idUser = req.tokenData._id;
     try {
       let upgrateData = await cvUpgrade(json);
-      console.log(upgrateData);
+      console.log(upgrateData.error);
       // if (upgrateData.syntaxError) {
       //   console.log("22222222222222");
       //   upgrateData = await cvUpgrade(json);
@@ -52,7 +52,6 @@ router.post("/convert", auth, upload.single("file"), async (req, res, next) => {
       // }
       let resume = new ResumeModel(upgrateData);
       console.log(resume);
-
       resume._idUser = _idUser;
       const data = await resume.save();
       console.log(data);
