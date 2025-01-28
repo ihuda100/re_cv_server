@@ -29,11 +29,7 @@ exports.validResume = (_bodyData) => {
     linkdin: Joi.string().max(100).allow("").optional(),
     gitHub: Joi.string().max(100).allow("").optional(),
     ifUpdate: Joi.boolean().allow(""),
-    body: // Joi.alternatives()
-      // .try(
-        Joi.object().min(0).max(50)
-        //  Joi.string().min(5).max(10000))
-      .required(),
+    body: Joi.object().min(0).max(50).required(),
   });
   return joiSchema.validate(_bodyData);
 };
