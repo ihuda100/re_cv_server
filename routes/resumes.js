@@ -41,6 +41,9 @@ router.post("/convert", auth, upload.single("file"), async (req, res, next) => {
     let _idUser = req.tokenData._id;
     try {
       let upgrateData = await cvUpgrade(json);
+      if(upgrateData.error){
+        return res.status(400).json(upgrateData.error)
+      }
       let resume = new ResumeModel(upgrateData);
       resume._idUser = _idUser;
       const data = await resume.save();

@@ -131,7 +131,7 @@ async function upgradeResumeJson(resumeJson, profession) {
 
     // בדיקה אם הפורמט תקין
     if (!sanitizedResponse.startsWith("{") || !sanitizedResponse.endsWith("}")) {
-      throw new Error("Response is not in valid JSON format.");
+      return res.status(400).json({error: "Response is not in valid JSON format."});
     }
 
     // ניסיון לפענח את ה-JSON
@@ -139,7 +139,7 @@ async function upgradeResumeJson(resumeJson, profession) {
 
     // בדיקת שדות חובה
     if (!upgradedData.fullName || !upgradedData.phone || !upgradedData.body) {
-      throw new Error("Missing required fields in the JSON response.");
+      return res.status(400).json({error: "Missing required fields in the JSON response."});
     }
 
     console.log("Upgraded Resume JSON:", upgradedData);
