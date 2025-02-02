@@ -94,9 +94,9 @@ async function upgradeResumeJson(resumeJson, profession) {
           {
             "fullName": "not change",   
             "phone": "ONLY number",  
-            "email": "not change",   
-            "linkdin": "DONT change/create", 
-            "gitHub": "DONT change/create",  
+            "email": "Do not change the original email",   
+            "linkdin": "Return exactly the same value as provided. If empty, keep it empty.", 
+            "gitHub": "Return exactly the same value as provided. If empty, keep it empty.",  
             "body": [{
               "key": "titel",
               "value": "body in String"
