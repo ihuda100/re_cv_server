@@ -1,6 +1,6 @@
 var express = require("express");
 const { ResumeModel, validResume } = require("../models/resumeModel");
-const { auth } = require("../middlewares/auth");
+const { auth, authAdmin } = require("../middlewares/auth");
 const { convertPDFToJson, cvUpgrade } = require("../middlewares/gpt");
 const { pdfGeneret } = require("../middlewares/pdfStyle");
 var router = express.Router();
@@ -17,9 +17,8 @@ router.get("/", (req, res, next) => {
 });
 
 //GET information on client by ID
-router.get("/:id", async (req, res, next) => {
+router.get("/userlist/:id", authAdmin, async (req, res, next) => {
   let id = req.params.id;
-  console.log(id);
   try {
     const uesrList = await ResumeModel.find({ _idUser: id });
     if (uesrList.length == 0) {
@@ -42,14 +41,6 @@ router.post("/convert", auth, upload.single("file"), async (req, res, next) => {
     let _idUser = req.tokenData._id;
     try {
       let upgrateData = await cvUpgrade(json);
-      // console.log(upgrateData.error);
-      // if (upgrateData.syntaxError) {
-      //   console.log("22222222222222");
-      //   upgrateData = await cvUpgrade(json);
-      //   if (upgrateData.syntaxError) {
-      //     return res.status(400).json(upgrateData.SyntaxError);
-      //   }
-      // }
       let resume = new ResumeModel(upgrateData);
       resume._idUser = _idUser;
       const data = await resume.save();
@@ -74,13 +65,6 @@ router.post("/upgrade", auth, async (req, res, next) => {
     let data = req.body;
     let upgrateData = await cvUpgrade(data);
     console.log(upgrateData);
-    if (upgrateData.SyntaxError) {
-      console.log("22222222222222");
-      upgrateData = await cvUpgrade(json);
-      if (upgrateData.SyntaxError) {
-        return res.status(400).json(upgrateData.SyntaxError);
-      }
-    }
     let resume = new ResumeModel(upgrateData);
     resume._idUser = _idUser;
     await resume.save();
@@ -118,6 +102,19 @@ router.post("/getinfo", async (req, res, next) => {
     res.status(200).json(resume);
   } catch (err) {
     res.status(404).json({ err, message: "the _id is not found" });
+  }
+});
+
+router.get("/history", auth, async (req, res, next) => {
+  const _idUser = req.tokenData._id;
+  try {
+    const history = await ResumeModel.find({ _idUser: _idUser });
+    if (history.length == 0) {
+      return res.status(404).json({ error: "No resumes found" });
+    }
+    res.status(200).json(history);
+  } catch (err) {
+    res.status(404).json(err);
   }
 });
 
