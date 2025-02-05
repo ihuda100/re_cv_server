@@ -29,8 +29,7 @@ async function extractTextFromPDF(pdf) {
     const data = await pdfParse(dataBuffer);
     return data.text;
   } catch (error) {
-    console.error("Error extracting text from PDF:", error.message);
-    throw error;
+    res.status(422).json({ message: "Error extracting text from PDF:", error });
   }
 }
 
@@ -68,16 +67,15 @@ async function organizeResumeData(textContent) {
     try {
       organizedData = JSON.parse(rawResponse);
     } catch (parseError) {
-      console.error(
-        "Error parsing OpenAI response. Returning raw response for manual review."
-      );
-      organizedData = { raw_response: rawResponse };
+      return res.status(422).json({
+        error:
+          "Error parsing OpenAI response. Returning raw response for manual review.",
+      });
     }
 
     return organizedData;
   } catch (error) {
-    console.error("Error organizing resume data:", error.message);
-    throw error;
+    res.status(422).json({ message: "Error organizing resume data:", error });
   }
 }
 
@@ -130,8 +128,13 @@ async function upgradeResumeJson(resumeJson, profession) {
     console.log("Sanitized Response:", sanitizedResponse);
 
     // בדיקה אם הפורמט תקין
-    if (!sanitizedResponse.startsWith("{") || !sanitizedResponse.endsWith("}")) {
-      return res.status(400).json({error: "Response is not in valid JSON format."});
+    if (
+      !sanitizedResponse.startsWith("{") ||
+      !sanitizedResponse.endsWith("}")
+    ) {
+      return res
+        .status(422)
+        .json({ error: "Response is not in valid JSON format." });
     }
 
     // ניסיון לפענח את ה-JSON
@@ -139,14 +142,15 @@ async function upgradeResumeJson(resumeJson, profession) {
 
     // בדיקת שדות חובה
     if (!upgradedData.fullName || !upgradedData.phone || !upgradedData.body) {
-      return res.status(400).json({error: "Missing required fields in the JSON response."});
+      return res
+        .status(422)
+        .json({ error: "Missing required fields in the JSON response." });
     }
 
     console.log("Upgraded Resume JSON:", upgradedData);
     return upgradedData;
   } catch (error) {
-    console.error("Error upgrading resume JSON:", error.message);
-    return { error: error.message };
+    res.status(422).json({ message: "Error upgrading resume JSON:", error });
   }
 }
 
@@ -157,8 +161,7 @@ async function processResume(data) {
     const organizedJson = await organizeResumeData(extractedText);
     return organizedJson;
   } catch (error) {
-    console.error("Error converting PDF to JSON:", error.message);
-    throw error;
+    res.status(422).json({ message: "Error converting PDF to JSON:", error });
   }
 }
 
@@ -166,13 +169,16 @@ const convertPDFToJson = (data) => {
   try {
     return processResume(data);
   } catch (err) {
-    console.error(err);
+    res.status(422).json(err);
   }
-  // upgradeResumeJson(processResume(),"Hitech");
 };
 
 const cvUpgrade = (data) => {
-  return upgradeResumeJson(data, "Hitech");
+  try {
+    return upgradeResumeJson(data, "Hitech");
+  } catch (err) {
+    res.status(422).json(err);
+  }
 };
 
 module.exports = { convertPDFToJson, cvUpgrade };

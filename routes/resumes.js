@@ -50,10 +50,10 @@ router.post("/convert", auth, upload.single("file"), async (req, res, next) => {
       console.log(data);
       res.status(201).json(data);
     } catch (err) {
-      console.log(err);
+      res.status(400).json(err);
     }
   } catch (err) {
-    console.log(err);
+    res.status(401).json(err);
   }
 });
 
@@ -73,7 +73,7 @@ router.post("/upgrade", auth, async (req, res, next) => {
     await resume.save();
     res.status(201).json(resume);
   } catch (err) {
-    console.log(err);
+    res.status(401).json(err);
   }
 });
 
@@ -91,7 +91,7 @@ router.post("/update", async (req, res, next) => {
     let updateData = await ResumeModel.updateOne({ _id: resume._id }, resume);
     res.status(200).json(updateData);
   } catch (err) {
-    console.log(err);
+    res.status(401).json(err);
   }
 });
 

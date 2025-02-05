@@ -23,10 +23,10 @@ router.get("/single/:userId", async (req, res) => {
   try {
     let userId = req.params.userId;
     let data = await UserModel.findOne({ _id: userId });
-    res.json(data);
+    res.status(200).json(data);
   } catch (err) {
     console.log(err);
-    return res.status(500).json(err);
+    res.status(401).json(err);
   }
 });
 
