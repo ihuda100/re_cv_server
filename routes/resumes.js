@@ -16,7 +16,7 @@ router.get("/", (req, res, next) => {
   res.json({ msg: "Work from resumes.js" });
 });
 
-//GET information on client by ID
+//GET information on client by ID for Admin
 router.get("/userlist/:id", authAdmin, async (req, res, next) => {
   let id = req.params.id;
   try {
@@ -103,6 +103,7 @@ router.post("/update", async (req, res, next) => {
   }
 });
 
+// get resume information for client
 router.post("/getinfo", async (req, res, next) => {
   try {
     let _id = req.body.id;
@@ -115,6 +116,17 @@ router.post("/getinfo", async (req, res, next) => {
     res.status(404).json({ err, message: "the _id is not found" });
   }
 });
+
+// get resume information for client without verify
+// router.post("/forverify/:id", async (req, res, next) => {
+//   try {
+//     let _id = req.params.id;
+//     const resume = await ResumeModel.findOne({ _id });
+//     res.status(200).json(resume);
+//   } catch (err) {
+//     res.status(404).json({ err, message: "the _id is not found" });
+//   }
+// });
 
 router.get("/history", auth, async (req, res, next) => {
   const _idUser = req.tokenData._id;
