@@ -32,28 +32,32 @@ router.get("/userlist/:id", authAdmin, async (req, res, next) => {
 // Convert from PDF to json
 router.post("/convert", auth, upload.single("file"), async (req, res, next) => {
   try {
-    let json = await convertPDFToJson(req.file.path);
-    fs.unlinkSync(req.file.path); // Delete file from upload after read
+    let json;
+    try {
+      json = await convertPDFToJson(req.file.path);
+      fs.unlinkSync(req.file.path);
+    } catch (error) {
+      fs.unlinkSync(req.file.path);
+      return res.status(422).json({ message: error.message });
+    }
     let validBody = validResume(json);
     if (validBody.error) {
       return res.status(400).json(validBody.error.details);
     }
     let _idUser = req.tokenData._id;
+    let upgrateData;
     try {
-      let upgrateData = await cvUpgrade(json);
-      if(upgrateData.error){
-        return res.status(400).json(upgrateData.error)
-      }
-      let resume = new ResumeModel(upgrateData);
-      resume._idUser = _idUser;
-      const data = await resume.save();
-      console.log(data);
-      res.status(201).json(data);
-    } catch (err) {
-      res.status(400).json(err);
+      upgrateData = await cvUpgrade(json);
+    } catch (error) {
+      return res.status(422).json({ message: error.message });
     }
-  } catch (err) {
-    res.status(401).json(err);
+    let resume = new ResumeModel(upgrateData);
+    resume._idUser = _idUser;
+    const data = await resume.save();
+    console.log(data);
+    res.status(201).json(data);
+  } catch (error) {
+    res.status(401).json(error);
   }
 });
 
@@ -63,17 +67,21 @@ router.post("/upgrade", auth, async (req, res, next) => {
   if (validBody.error) {
     return res.status(400).json(validBody.error.details);
   }
+  let _idUser = req.tokenData._id;
+  let data = req.body;
   try {
-    let _idUser = req.tokenData._id;
-    let data = req.body;
-    let upgrateData = await cvUpgrade(data);
-    console.log(upgrateData);
+    let upgrateData;
+    try {
+      upgrateData = await cvUpgrade(data);
+    } catch (error) {
+      return res.status(422).json({ message: error.message });
+    }
     let resume = new ResumeModel(upgrateData);
     resume._idUser = _idUser;
     await resume.save();
     res.status(201).json(resume);
-  } catch (err) {
-    res.status(401).json(err);
+  } catch (error) {
+    res.status(401).json(error);
   }
 });
 

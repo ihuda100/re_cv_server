@@ -29,7 +29,7 @@ async function extractTextFromPDF(pdf) {
     const data = await pdfParse(dataBuffer);
     return data.text;
   } catch (error) {
-    res.status(422).json({ message: "Error extracting text from PDF:", error });
+    throw new Error("Error extracting text from PDF: " + error.message); 
   }
 }
 
@@ -67,15 +67,12 @@ async function organizeResumeData(textContent) {
     try {
       organizedData = JSON.parse(rawResponse);
     } catch (parseError) {
-      return res.status(422).json({
-        error:
-          "Error parsing OpenAI response. Returning raw response for manual review.",
-      });
+      throw new Error("Error parsing AI response. Returning raw response for manual review."); 
     }
 
     return organizedData;
   } catch (error) {
-    res.status(422).json({ message: "Error organizing resume data:", error });
+    throw new Error("Error organizing resume data: " + error.message); 
   }
 }
 
@@ -105,10 +102,6 @@ async function upgradeResumeJson(resumeJson, profession) {
           Respond ONLY with JSON in the specified format. Do not include any additional text or special characters outside the JSON structure.
           Tailor the resume for the profession: ${profession}.
           `,
-          // "in string with titles and body separated by newlines, formatted like:
-          //     Title: \\n
-          //     Body: \\n
-          //     ..."
         },
         { role: "user", content: JSON.stringify(resumeJson) },
       ],
@@ -132,9 +125,7 @@ async function upgradeResumeJson(resumeJson, profession) {
       !sanitizedResponse.startsWith("{") ||
       !sanitizedResponse.endsWith("}")
     ) {
-      return res
-        .status(422)
-        .json({ error: "Response is not in valid JSON format." });
+      throw new Error("Response is not in valid JSON format.");
     }
 
     // ניסיון לפענח את ה-JSON
@@ -142,15 +133,14 @@ async function upgradeResumeJson(resumeJson, profession) {
 
     // בדיקת שדות חובה
     if (!upgradedData.fullName || !upgradedData.phone || !upgradedData.body) {
-      return res
-        .status(422)
-        .json({ error: "Missing required fields in the JSON response." });
+      throw new Error("Missing required fields in the JSON response.");
     }
 
     console.log("Upgraded Resume JSON:", upgradedData);
     return upgradedData;
   } catch (error) {
-    res.status(422).json({ message: "Error upgrading resume JSON:", error });
+    console.log(error)
+    throw new Error("Error upgrading resume JSON: " + error.message);
   }
 }
 
@@ -161,7 +151,7 @@ async function processResume(data) {
     const organizedJson = await organizeResumeData(extractedText);
     return organizedJson;
   } catch (error) {
-    res.status(422).json({ message: "Error converting PDF to JSON:", error });
+    throw new Error("Error converting PDF to JSON: " + error.message);
   }
 }
 
@@ -169,7 +159,7 @@ const convertPDFToJson = (data) => {
   try {
     return processResume(data);
   } catch (err) {
-    res.status(422).json(err);
+    throw new Error(err)
   }
 };
 
@@ -177,7 +167,8 @@ const cvUpgrade = (data) => {
   try {
     return upgradeResumeJson(data, "Hitech");
   } catch (err) {
-    res.status(422).json(err);
+    console.log(err)
+    throw new Error(err)
   }
 };
 
