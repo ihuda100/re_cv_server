@@ -29,7 +29,7 @@ async function extractTextFromPDF(pdf) {
     const data = await pdfParse(dataBuffer);
     return data.text;
   } catch (error) {
-    throw new Error("Error extracting text from PDF: " + error.message); 
+    throw new Error("Error extracting text from PDF: " + error.message);
   }
 }
 
@@ -67,12 +67,14 @@ async function organizeResumeData(textContent) {
     try {
       organizedData = JSON.parse(rawResponse);
     } catch (parseError) {
-      throw new Error("Error parsing AI response. Returning raw response for manual review."); 
+      throw new Error(
+        "Error parsing AI response. Returning raw response for manual review."
+      );
     }
 
     return organizedData;
   } catch (error) {
-    throw new Error("Error organizing resume data: " + error.message); 
+    throw new Error("Error organizing resume data: " + error.message);
   }
 }
 
@@ -93,11 +95,13 @@ async function upgradeResumeJson(resumeJson, profession) {
             "linkdin": "Return exactly the same value as provided. If empty, keep it empty.", 
             "gitHub": "Return exactly the same value as provided. If empty, keep it empty.",  
             "body": [{
-              "key": "titel",
+              "key": "title",
               "value": "body in String"
               ONLY in freeWords "key": "", "value": "General strengths extracted or improved from freeWords, in string format"
               ALSO word experience with \\n between difference works
             }]
+
+            
           } 
           Respond ONLY with JSON in the specified format. Do not include any additional text or special characters outside the JSON structure.
           Tailor the resume for the profession: ${profession}.
@@ -139,7 +143,7 @@ async function upgradeResumeJson(resumeJson, profession) {
     console.log("Upgraded Resume JSON:", upgradedData);
     return upgradedData;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     throw new Error("Error upgrading resume JSON: " + error.message);
   }
 }
@@ -159,7 +163,7 @@ const convertPDFToJson = (data) => {
   try {
     return processResume(data);
   } catch (err) {
-    throw new Error(err)
+    throw new Error(err);
   }
 };
 
@@ -167,8 +171,8 @@ const cvUpgrade = (data) => {
   try {
     return upgradeResumeJson(data, "Hitech");
   } catch (err) {
-    console.log(err)
-    throw new Error(err)
+    console.log(err);
+    throw new Error(err);
   }
 };
 
