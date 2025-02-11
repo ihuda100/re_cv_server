@@ -25,7 +25,7 @@ exports.validResume = (_bodyData) => {
     dateCreated: Joi.string().optional(),
     fullName: Joi.string().min(5).max(30).required(),
     email: Joi.string().min(5).max(30).email().required(),
-    phone: Joi.string().min(10).max(15).required(),
+    phone: Joi.string().min(9).max(15).required(),
     linkdin: Joi.string().max(100).allow("").optional(),
     gitHub: Joi.string().max(100).allow("").optional(),
     ifUpdate: Joi.boolean().allow(""),

@@ -25,7 +25,6 @@ router.get("/single/:userId", async (req, res) => {
     let data = await UserModel.findOne({ _id: userId });
     res.status(200).json(data);
   } catch (err) {
-    console.log(err);
     res.status(401).json(err);
   }
 });

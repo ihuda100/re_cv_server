@@ -98,7 +98,7 @@ async function upgradeResumeJson(resumeJson, profession) {
               "key": "title",
               "value": "body in String"
               ONLY in freeWords "key": "", "value": "General strengths extracted or improved from freeWords, in string format"
-              ALSO word experience with \\n between difference works
+              ALSO word experience with . and \\n between difference works
             }]
 
             

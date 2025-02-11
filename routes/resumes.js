@@ -20,11 +20,12 @@ router.get("/", (req, res, next) => {
 router.get("/userlist/:id", authAdmin, async (req, res, next) => {
   let id = req.params.id;
   try {
-    const uesrList = await ResumeModel.find({ _idUser: id });
-    if (uesrList.length == 0) {
+    let userList = await ResumeModel.find({ _idUser: id });
+    userList = userList.filter((resume) => resume.ifUpdate )
+    if (userList.length == 0) {
       return res.status(404).json({ error: "No resumes found for this ID" });
     }
-    res.status(200).json(uesrList);
+    res.status(200).json(userList);
   } catch (err) {
     res.status(404).json({ error: "dont have resumes in this id" });
   }
@@ -131,7 +132,8 @@ router.post("/getinfo", async (req, res, next) => {
 router.get("/history", auth, async (req, res, next) => {
   const _idUser = req.tokenData._id;
   try {
-    const history = await ResumeModel.find({ _idUser: _idUser });
+    let history = await ResumeModel.find({ _idUser: _idUser });
+    history = history.filter((resume) => resume.ifUpdate)
     if (history.length == 0) {
       return res.status(404).json({ error: "No resumes found" });
     }
