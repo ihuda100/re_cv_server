@@ -186,25 +186,7 @@ router.patch("/changePass", async (req, res) => {
   }
 });
 
-//  Choosing template
-router.patch("/template", auth, async (req, res) => {
-  let token = req.header("x-api-key");
-  let decodeToken = jwt.verify(token, process.env.JWT_SECRET);
-  let token_id = decodeToken._id;
-  let thisTemplate = req.body.template;
-  console.log(thisTemplate);
-  console.log(token_id);
-  try {
-    let user = await UserModel.findOne({ _id: token_id });
-    console.log(user);
-    user.template = thisTemplate;
-    let newData = await UserModel.updateOne({ _id: user._id }, user);
-    res.status(200).json(newData);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json(err);
-  }
-});
+
 
 // Update for user
 router.put("/edit", auth, async (req, res) => {

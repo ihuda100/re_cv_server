@@ -9,6 +9,7 @@ const multer = require("multer");
 const { log } = require("util");
 const { error } = require("console");
 const { resourceLimits } = require("worker_threads");
+const jwt = require("jsonwebtoken");
 const upload = multer({ dest: "uploads/" });
 
 /* GET home page. */
@@ -118,17 +119,6 @@ router.post("/getinfo", async (req, res, next) => {
   }
 });
 
-// get resume information for client without verify
-// router.post("/forverify/:id", async (req, res, next) => {
-//   try {
-//     let _id = req.params.id;
-//     const resume = await ResumeModel.findOne({ _id });
-//     res.status(200).json(resume);
-//   } catch (err) {
-//     res.status(404).json({ err, message: "the _id is not found" });
-//   }
-// });
-
 router.get("/history", auth, async (req, res, next) => {
   const _idUser = req.tokenData._id;
   try {
@@ -140,6 +130,22 @@ router.get("/history", auth, async (req, res, next) => {
     res.status(200).json(history);
   } catch (err) {
     res.status(404).json(err);
+  }
+});
+
+//  Choosing template
+router.patch("/template", async (req, res) => {
+  let thisTemplate = req.body.template;
+  let _id = req.body.id; 
+  try {
+    let resume = await ResumeModel.findOne({ _id });
+    console.log(resume);
+    resume.template = thisTemplate;
+    let newData = await ResumeModel.updateOne({ _id: resume._id }, resume);
+    res.status(200).json(newData);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(err);
   }
 });
 

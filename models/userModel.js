@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
     verifiction: {
         type: Boolean, default: false
     },
-    template: String,
+    // template: String,
 });
 
 exports.UserModel = mongoose.model("users", userSchema);
@@ -25,7 +25,7 @@ exports.validUser = (_bodyData) => {
         LastName: Joi.string().min(2).max(99).required(),
         email: Joi.string().min(5).max(99).email().required(),
         password: Joi.string().min(2).max(99).required(),
-        template: Joi.string().optional(),
+        // template: Joi.string().optional(),
     });
 
     return joiSchema.validate(_bodyData);

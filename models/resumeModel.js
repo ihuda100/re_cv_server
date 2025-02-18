@@ -14,6 +14,7 @@ const resumeSchema = new mongoose.Schema({
     default: false,
   },
   dateCreated: { type: Date, default: Date.now },
+  template: String,
 });
 exports.ResumeModel = mongoose.model("resumes", resumeSchema);
 
@@ -27,8 +28,9 @@ exports.validResume = (_bodyData) => {
     email: Joi.string().min(5).max(30).email().required(),
     phone: Joi.string().min(9).max(15).required(),
     linkdin: Joi.string().max(100).allow("").optional(),
-    gitHub: Joi.string().max(100).allow("").optional(),
+    gitHub: Joi.string().max(100).allow("").optional(), 
     ifUpdate: Joi.boolean().allow(""),
+    template: Joi.string().optional(),
     body: Joi.alternatives()
       .try(Joi.array().min(1), Joi.object().min(1))
       .required(),
