@@ -42,16 +42,16 @@ router.post("/convert", auth, upload.single("file"), async (req, res, next) => {
       fs.unlinkSync(req.file.path);
       return res.status(422).json({ message: error.message });
     }
-    let validBody = validResume(json);
-    if (validBody.error) {
-      return res.status(400).json(validBody.error.details);
-    }
     let _idUser = req.tokenData._id;
     let upgrateData;
     try {
       upgrateData = await cvUpgrade(json);
     } catch (error) {
       return res.status(422).json({ message: error.message });
+    }
+    let validBody = validResume(json);
+    if (validBody.error) {
+      return res.status(400).json(validBody.error.details);
     }
     let resume = new ResumeModel(upgrateData);
     resume._idUser = _idUser;
