@@ -1,9 +1,5 @@
-//
-
 require("dotenv").config(); // Load environment variables from .env
-
 const fs = require("fs");
-// const path = require('path');
 const pdfParse = require("pdf-parse");
 const { OpenAI } = require("openai");
 const { error } = require("console");
@@ -55,7 +51,6 @@ async function organizeResumeData(textContent) {
             }
           } 
           Return only the clean JSON without any additional text. Ensure that the JSON is well-structured and contains no unnecessary information.`,
-          // categories // "personal_information", "objective", "education", "work_experience", "skills", "languages", and "projects".
         },
         { role: "user", content: textContent },
       ],
@@ -78,7 +73,7 @@ async function organizeResumeData(textContent) {
   }
 }
 
-async function upgradeResumeJson(resumeJson, profession) {
+async function upgradeResumeJson(resumeJson) {
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-4",
@@ -99,47 +94,33 @@ async function upgradeResumeJson(resumeJson, profession) {
               "value": "body in String"
               ONLY in freeWords "key": "", "value": "General strengths extracted or improved from freeWords, in string format"
               ALSO word experience with . and \\n between difference works
-            }]
-
-            
+            }]  
           } 
           Respond ONLY with JSON in the specified format. Do not include any additional text or special characters outside the JSON structure.
-          Tailor the resume for the profession: ${profession}.
           `,
         },
         { role: "user", content: JSON.stringify(resumeJson) },
       ],
     });
-
     const rawResponse = response.choices[0].message.content.trim();
     console.log("Raw Response from OpenAI:", rawResponse);
-
-    // ניקוי התגובה
     const sanitizeResponse = (response) => {
       return response
-        .replace(/[\u0000-\u001F\u007F-\u009F]/g, "") // הסרת תווים לא חוקיים
-        .trim(); // הסרת רווחים מיותרים
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
+        .trim();
     };
-
     const sanitizedResponse = sanitizeResponse(rawResponse);
     console.log("Sanitized Response:", sanitizedResponse);
-
-    // בדיקה אם הפורמט תקין
     if (
       !sanitizedResponse.startsWith("{") ||
       !sanitizedResponse.endsWith("}")
     ) {
       throw new Error("Response is not in valid JSON format.");
     }
-
-    // ניסיון לפענח את ה-JSON
     const upgradedData = JSON.parse(sanitizedResponse);
-
-    // בדיקת שדות חובה
     if (!upgradedData.fullName || !upgradedData.phone || !upgradedData.body) {
       throw new Error("Missing required fields in the JSON response.");
     }
-
     console.log("Upgraded Resume JSON:", upgradedData);
     return upgradedData;
   } catch (error) {

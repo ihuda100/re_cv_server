@@ -22,7 +22,7 @@ router.get("/userlist/:id", authAdmin, async (req, res, next) => {
   let id = req.params.id;
   try {
     let userList = await ResumeModel.find({ _idUser: id });
-    userList = userList.filter((resume) => resume.ifUpdate )
+    userList = userList.filter((resume) => resume.ifUpdate);
     if (userList.length == 0) {
       return res.status(404).json({ error: "No resumes found for this ID" });
     }
@@ -65,10 +65,6 @@ router.post("/convert", auth, upload.single("file"), async (req, res, next) => {
 
 // Upgrades the resume
 router.post("/upgrade", auth, async (req, res, next) => {
-  let validBody = validResume(req.body);
-  if (validBody.error) {
-    return res.status(400).json(validBody.error.details);
-  }
   let _idUser = req.tokenData._id;
   let data = req.body;
   try {
@@ -77,6 +73,10 @@ router.post("/upgrade", auth, async (req, res, next) => {
       upgrateData = await cvUpgrade(data);
     } catch (error) {
       return res.status(422).json({ message: error.message });
+    }
+    let validBody = validResume(req.body);
+    if (validBody.error) {
+      return res.status(400).json(validBody.error.details);
     }
     let resume = new ResumeModel(upgrateData);
     resume._idUser = _idUser;
@@ -123,7 +123,9 @@ router.get("/history", auth, async (req, res, next) => {
   const _idUser = req.tokenData._id;
   try {
     let history = await ResumeModel.find({ _idUser: _idUser });
-    history = history.filter((resume) => resume.ifUpdate)
+    history = history.filter((resume) => {
+      return resume.ifUpdate;
+    });
     if (history.length == 0) {
       return res.status(404).json({ error: "No resumes found" });
     }
@@ -136,7 +138,7 @@ router.get("/history", auth, async (req, res, next) => {
 //  Choosing template
 router.patch("/template", async (req, res) => {
   let thisTemplate = req.body.template;
-  let _id = req.body.id; 
+  let _id = req.body.id;
   try {
     let resume = await ResumeModel.findOne({ _id });
     console.log(resume);
